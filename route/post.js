@@ -48,7 +48,7 @@ router.get('/allpost',requireLogin,(req,res)=>{
 })
 
 router.post('/myallpost',requireLogin,(req,res)=>{
-    console.log(req.body.id)
+   
    
    Post.find({postedBy:req.body.id})
       .populate('postedBy','_id name pic')
@@ -79,8 +79,8 @@ router.get('/mypost',requireLogin,(req,res)=>{
     .sort("-createdAt")
     .then(myPost =>{
     User.findOne({_id:req.user._id})
-        //  .populate("followers","_id name")
-        //  .populate("following","_id name")
+         .populate("followers","_id name pic")
+         .populate("following","_id name pic")
         .then(user=>{
             res.send({user:user,mypost:myPost})
         })

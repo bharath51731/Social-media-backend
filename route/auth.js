@@ -2,8 +2,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 var bcrypt = require('bcrypt')
 var router = express.Router()
-// const nodemailer = require('nodemailer')
-// const sendgridTransport = require('nodemailer-sendgrid-transport')
 require('../models/user')
 const jwt = require('jsonwebtoken');
 const User = mongoose.model("User")
@@ -11,24 +9,20 @@ const User = mongoose.model("User")
 const {JWT_SECRET} = require('../config/keys')
 const requireLogin = require('../middlewares/requireLogin')
 
+var nodemailer = require('nodemailer');
 
-// const transporter = nodemailer.createTransport(sendgridTransport({
-//     auth:{
-//         api_key:'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'
-//     }
-// }))
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'weconnectdevelopers@gmail.com',
+        pass: '963214@6'
+    }
+  });
 
-// const sgMail = require('@sendgrid/mail')
-// sgMail.setApiKey('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')
-// const msg={
-//     to : "bharathkumar51731@gmail.com",
-//     from : "bharathshettigar925@gmail.com",
-//     subject : "Fun",
-//     text : "super"
-// }
-// sgMail.send(msg)
+
+
 router.get('/',(req,res)=>{
-    res.send('route')
+    res.send('Updated')
 })
 
 router.get('/protected',requireLogin,(req,res)=>{
@@ -61,13 +55,21 @@ router.post('/signup',(req,res)=>{
 
         users.save()
         .then(user => {
-            // transporter.sendMail({
-            //         to:email,
-            //         from:"bharathshettigar925@gmail.com",
-            //         subject:"signup success",
-            //         html:"<h1>welcome to instagram</h1>"
-            //     })
-            return res.json({"meassge":"saved succesfully"})
+            var mailOptions = {
+                from: 'weconnectdevelopers@gmail.com',
+                to: email,
+                subject: 'Welcome',
+                text: 'Succesfully Signed in to We connect'
+              };
+              
+              transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                   
+                } else {
+                  
+                }
+              });
+            return res.json({"meassge":"Account Created succesfully"})
         })
         .catch(err => console.log(err))
     })
@@ -140,11 +142,52 @@ router.put('/changepass',requireLogin,(req,res)=>{
                
             }
             else
-            return res.status(422).json({"error":"credentials invalid"})
+            return res.status(422).json({"error":"Wrong Password"})
         }).catch(err=>console.log(err))
     }).catch(err=>console.log(err))
 })
 
+router.put('/reset',(req,res)=>{
+    User.findOne({email:req.body.email})
+    .then(saveduser =>{
+        if(!saveduser)
+        {
+            return res.status(422).json({"error":"Invalid Email"}) 
+        }
+        else
+        {
+            var randompass = Math.random().toString(36).slice(-10);
+            // console.log(randompass)
+             
+        bcrypt.hash(randompass,12)
+        .then(hashedpassword =>{
+            User.updateOne({email:req.body.email},{$set:{
+                password:hashedpassword
+            }})
+            .then(pass=>{
+                var mailOptions = {
+                    from: 'weconnectdevelopers@gmail.com',
+                    to: req.body.email,
+                    subject: 'Reset Password',
+                    text: `We Recommend Once You Sign in Change your password use below Password to Sign in\n${randompass}`
+                  };
+                  
+                  transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                        return res.status(422).json({"error":"Something went wrong"})
+                    } else {
+                      res.json({"message":"Updated Succesfully"})
+                    }
+                  });
+            })
+            .catch(err => console.log(err))
+        })
+        .catch(err=>console.log(err))
+
+        }
+    })
+    
+})
 
 
 

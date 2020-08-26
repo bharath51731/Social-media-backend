@@ -20,8 +20,12 @@ router.get('/user/:id',(req,res)=>{
         .exec((err,posts)=>{
             if(err)
             return res.status(422).json({"error":err})
-
-            res.json({user,posts})
+            
+            
+                res.json({user,posts})
+          
+           
+            
         })
     })
     .catch(err=>{
@@ -103,7 +107,7 @@ router.put('/changepic',requireLogin,(req,res)=>{
     .catch(err=>console.log(err))
 })
 router.put('/delpic',requireLogin,(req,res)=>{
-    User.updateOne({_id:req.user._id},{$set:{pic:"https://res.cloudinary.com/dnvgajic2/image/upload/v1597903364/download_hroout.jpg"}},{
+    User.updateOne({_id:req.user._id},{$set:{pic:"https://res.cloudinary.com/dnvgajic2/image/upload/v1598419807/default_user_brfslf.png"}},{
         new:true
     })
     .then(result=>{
@@ -114,7 +118,7 @@ router.put('/delpic',requireLogin,(req,res)=>{
 
 router.post('/search-users',(req,res)=>{
     let userPattern = new RegExp("^"+req.body.query,"i")
-    User.find({name:{$regex:userPattern}})
+    User.find({$or:[{name:{$regex:userPattern}},{email:{$regex:userPattern}}]})
     .select("_id name pic")
     .then(user=>{
         res.json({user})
@@ -142,35 +146,29 @@ router.delete('/delacc',requireLogin,(req,res)=>{
         }
 
         bcrypt.compare(pass,saveduser.password)
-        .then(match=>{
+        .then((match)=>{
             
             if(match)
             {
                 //  console.log(req.user._id)
-                // User.findOne({_id:req.user._id})
+                User.findOne({_id:req.user._id})
                 
 
-                // .then(result=>{
-                //     result.followers.map((id,i)=>{
-                //         console.log(id)
-                //         User.findByIdAndUpdate(id,{
-                //             $pull:{following:req.user._id}
-                //         })
-                //         ,{
-                //             new:true
-                //         }
+                .then(async result=>{
+                    // User.updateMany({_id:{$in:result.followers}},{$pull:{following:req.user._id}})
+                    // .then(r=>{
+                    //     User.updateMany({_id:{$in:result.following}},{$pull:{followers:req.user._id}}).then(r=>{
 
-                //     })
-                //     result.following.map((id,i)=>{
-                //         console.log(id)
-                //         User.findByIdAndUpdate(id,{
-                //             $pull:{followers:req.user._id}
-                //         })
-                //         ,{
-                //             new:true
-                //         }
-                //     })
-                // })
+                    //     })
+                    // })
+                    await User.updateMany({_id:{$in:result.followers}},{$pull:{following:req.user._id}})
+                    await User.updateMany({_id:{$in:result.following}},{$pull:{followers:req.user._id}})
+                    
+                    // console.log(result.followers)
+                    // console.log(result.following)
+                })
+                
+                
                
                 
                Post.deleteMany({postedBy:req.user._id})
@@ -178,12 +176,18 @@ router.delete('/delacc',requireLogin,(req,res)=>{
                    User.deleteOne({_id:req.user._id})
                    .then(result=>res.json({"message":"Succefully deleted"}))
                })
+          
             
             }
             else
-            return res.status(422).json({"error":"credentials invalid"})
+            {
+                res.json({"error":"Wrong Password"})
+            }
+           
         }).catch(err=>console.log(err))
     }).catch(err=>console.log(err))
+
+
 })
 router.get('/followers',requireLogin,(req,res)=>{
          User.find({_id:req.user._id})
