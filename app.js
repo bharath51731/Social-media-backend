@@ -26,4 +26,4 @@ require('./models/user')
 require('./models/post')
 
 
-app.listen(7000);
+app.listen(process.env.PORT || 8000);

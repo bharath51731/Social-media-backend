@@ -22,7 +22,7 @@ var transporter = nodemailer.createTransport({
 
 
 router.get('/',(req,res)=>{
-    res.send('Updated')
+    res.send('Updated1')
 })
 
 router.get('/protected',requireLogin,(req,res)=>{
