@@ -36,7 +36,7 @@ router.get('/user/:id',(req,res)=>{
 
 router.put('/follow',requireLogin,(req,res)=>{
     User.findByIdAndUpdate(req.body.followid,{
-     $push:{followers:req.user._id}
+     $addToSet:{followers:req.user._id}
     },
     {
         new:true
@@ -46,7 +46,7 @@ router.put('/follow',requireLogin,(req,res)=>{
         return res.status(422).json({"error":err})
 
         User.findByIdAndUpdate(req.user._id,{
-            $push:{following:req.body.followid}
+            $addToSet:{following:req.body.followid}
         },{
             new:true
         })
