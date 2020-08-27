@@ -142,7 +142,7 @@ router.delete('/delacc',requireLogin,(req,res)=>{
     .then(saveduser =>{
         if(!saveduser)
         {
-            return res.status(422).json({"error":"Invalid username or password"})
+            return res.status(422).json({"error":"Invalid Email or password"})
         }
 
         bcrypt.compare(pass,saveduser.password)
@@ -163,6 +163,10 @@ router.delete('/delacc',requireLogin,(req,res)=>{
                     // })
                     await User.updateMany({_id:{$in:result.followers}},{$pull:{following:req.user._id}})
                     await User.updateMany({_id:{$in:result.following}},{$pull:{followers:req.user._id}})
+
+                    await Post.updateMany({},{$pull:{comments:{postedBy:req.user._id}}})
+                    await Post.updateMany({},{$pull:{likes:req.user._id}})
+                    // await Post.updateMany({postedBy:{$in:result.following}},{$pull:{comments:req.user._id}})
                     
                     // console.log(result.followers)
                     // console.log(result.following)

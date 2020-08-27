@@ -32,7 +32,7 @@ router.post('/signup',(req,res)=>{
     const {email,password,name,url} = req.body;
     if(!email || !name || !password)
     {
-        return res.status(422).json({"error":"please add all the fields"})
+        return res.status(422).json({"error":"Please add all the fields"})
     }
    
     User.findOne({email:email})
@@ -83,14 +83,14 @@ router.post('/signin',(req,res)=>{
 
     if(!email || !password)
     {
-        return res.status(422).json({"message":"Invalid username or password"})
+        return res.status(422).json({"message":"Invalid Email or password"})
     }
 
     User.findOne({email})
     .then(saveduser =>{
         if(!saveduser)
         {
-            return res.status(422).json({"error":"Invalid username or password"})
+            return res.status(422).json({"error":"Invalid Email or password"})
         }
 
         bcrypt.compare(password,saveduser.password)
@@ -103,7 +103,7 @@ router.post('/signin',(req,res)=>{
                
             }
            
-            return res.status(422).json({"error":"Invalid username or password"})
+            return res.status(422).json({"error":"Invalid Email or password"})
         })
     })
 })
@@ -192,3 +192,7 @@ router.put('/reset',(req,res)=>{
 
 
 module.exports = router;
+
+//leelavathishettigar51731@gmail.com
+//bharathshettigar925@gmail.com
+//bharathkumar51731@gmail.com
