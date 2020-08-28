@@ -5,6 +5,7 @@ var router = express.Router()
 require('../models/user')
 const jwt = require('jsonwebtoken');
 const User = mongoose.model("User")
+const {password} = require('../config/keys')
 
 const {JWT_SECRET} = require('../config/keys')
 const requireLogin = require('../middlewares/requireLogin')
@@ -15,7 +16,7 @@ var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'weconnectdevelopers@gmail.com',
-        pass: '963214@6'
+        pass: password
     }
   });
 
