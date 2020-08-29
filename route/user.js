@@ -11,8 +11,6 @@ const requireLogin = require('../middlewares/requireLogin')
 
 router.get('/user/:id',(req,res)=>{
     User.findOne({_id:req.params.id})
-    // .populate("followers","_id name")
-    // .populate("following","_id name")
     .select("-password")
     .then(user=>{
         Post.find({postedBy:req.params.id})
@@ -20,12 +18,7 @@ router.get('/user/:id',(req,res)=>{
         .exec((err,posts)=>{
             if(err)
             return res.status(422).json({"error":err})
-            
-            
                 res.json({user,posts})
-          
-           
-            
         })
     })
     .catch(err=>{
@@ -150,32 +143,17 @@ router.delete('/delacc',requireLogin,(req,res)=>{
             
             if(match)
             {
-                //  console.log(req.user._id)
-                User.findOne({_id:req.user._id})
                 
-
+                User.findOne({_id:req.user._id})
                 .then(async result=>{
-                    // User.updateMany({_id:{$in:result.followers}},{$pull:{following:req.user._id}})
-                    // .then(r=>{
-                    //     User.updateMany({_id:{$in:result.following}},{$pull:{followers:req.user._id}}).then(r=>{
-
-                    //     })
-                    // })
                     await User.updateMany({_id:{$in:result.followers}},{$pull:{following:req.user._id}})
                     await User.updateMany({_id:{$in:result.following}},{$pull:{followers:req.user._id}})
 
                     await Post.updateMany({},{$pull:{comments:{postedBy:req.user._id}}})
                     await Post.updateMany({},{$pull:{likes:req.user._id}})
-                    // await Post.updateMany({postedBy:{$in:result.following}},{$pull:{comments:req.user._id}})
-                    
-                    // console.log(result.followers)
-                    // console.log(result.following)
+                
                 })
-                
-                
-               
-                
-               Post.deleteMany({postedBy:req.user._id})
+                Post.deleteMany({postedBy:req.user._id})
                .then(result=>{
                    User.deleteOne({_id:req.user._id})
                    .then(result=>res.json({"message":"Succefully deleted"}))

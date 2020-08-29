@@ -20,8 +20,6 @@ var transporter = nodemailer.createTransport({
     }
   });
 
-
-
 router.get('/',(req,res)=>{
     res.send('Update')
 })
@@ -158,7 +156,6 @@ router.put('/reset',(req,res)=>{
         else
         {
             var randompass = Math.random().toString(36).slice(-10);
-            // console.log(randompass)
              
         bcrypt.hash(randompass,12)
         .then(hashedpassword =>{
@@ -194,6 +191,3 @@ router.put('/reset',(req,res)=>{
 
 module.exports = router;
 
-//leelavathishettigar51731@gmail.com
-//bharathshettigar925@gmail.com
-//bharathkumar51731@gmail.com
