@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
         default:"https://res.cloudinary.com/dnvgajic2/image/upload/v1598419807/default_user_brfslf.png"
        },
     followers:[{type:ObjectId,ref:"User"}],
-    following:[{type:ObjectId,ref:"User"}]
+    following:[{type:ObjectId,ref:"User"}],
+    resetToken:String,
+    expireToken:Date
 })
 
 mongoose.model("User",userSchema)

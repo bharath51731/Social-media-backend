@@ -6,7 +6,7 @@ require('../models/user')
 const jwt = require('jsonwebtoken');
 const User = mongoose.model("User")
 const {password} = require('../config/keys')
-
+const crypto = require('crypto')
 const {JWT_SECRET} = require('../config/keys')
 const requireLogin = require('../middlewares/requireLogin')
 
@@ -146,47 +146,109 @@ router.put('/changepass',requireLogin,(req,res)=>{
     }).catch(err=>console.log(err))
 })
 
+// router.put('/reset',(req,res)=>{
+//     User.findOne({email:req.body.email})
+//     .then(saveduser =>{
+//         if(!saveduser)
+//         {
+//             return res.status(422).json({"error":"Invalid Email"}) 
+//         }
+//         else
+//         {
+//             var randompass = Math.random().toString(36).slice(-10);
+             
+//         bcrypt.hash(randompass,12)
+//         .then(hashedpassword =>{
+//             User.updateOne({email:req.body.email},{$set:{
+//                 password:hashedpassword
+//             }})
+//             .then(pass=>{
+//                 var mailOptions = {
+//                     from: 'weconnectdevelopers@gmail.com',
+//                     to: req.body.email,
+//                     subject: 'Reset Password',
+//                     text: `We Recommend Once You Sign in Change your password use below Password to Sign in\n${randompass}`
+//                   };
+                  
+//                   transporter.sendMail(mailOptions, function(error, info){
+//                     if (error) {
+//                         return res.status(422).json({"error":"Something went wrong"})
+//                     } else {
+//                       res.json({"message":"Updated Succesfully"})
+//                     }
+//                   });
+//             })
+//             .catch(err => console.log(err))
+//         })
+//         .catch(err=>console.log(err))
+
+//         }
+//     })
+    
+// })
+
+
 router.put('/reset',(req,res)=>{
     User.findOne({email:req.body.email})
-    .then(saveduser =>{
-        if(!saveduser)
+    .then(user =>{
+
+        if(!user)
         {
             return res.status(422).json({"error":"Invalid Email"}) 
         }
         else
         {
-            var randompass = Math.random().toString(36).slice(-10);
-             
-        bcrypt.hash(randompass,12)
-        .then(hashedpassword =>{
-            User.updateOne({email:req.body.email},{$set:{
-                password:hashedpassword
-            }})
-            .then(pass=>{
-                var mailOptions = {
-                    from: 'weconnectdevelopers@gmail.com',
-                    to: req.body.email,
-                    subject: 'Reset Password',
-                    text: `We Recommend Once You Sign in Change your password use below Password to Sign in\n${randompass}`
-                  };
-                  
-                  transporter.sendMail(mailOptions, function(error, info){
-                    if (error) {
-                        return res.status(422).json({"error":"Something went wrong"})
-                    } else {
-                      res.json({"message":"Updated Succesfully"})
-                    }
-                  });
+            crypto.randomBytes(32,(err,buffer)=>{
+                if(err){
+                    console.log(err)
+                }
+                const token = buffer.toString("hex")
+                user.resetToken = token
+                user.expireToken = Date.now() + 3600000
+                user.save().then((result)=>{
+                    var mailOptions = {
+                        from: 'weconnectdevelopers@gmail.com',
+                        to: req.body.email,
+                        subject: 'Reset Password',
+                        text: `Reset Password Link\nhttps://weconnect-frontend.herokuapp.com/newpass/${token}`
+                      };
+                      
+                      transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            return res.status(422).json({"error":"Something went wrong"})
+                        } else {
+                          res.json({"message":"check your mail"})
+                        }
+                      });
+                })
+               
             })
-            .catch(err => console.log(err))
-        })
-        .catch(err=>console.log(err))
-
+    
         }
     })
-    
 })
 
+router.post('/new-password',(req,res)=>{
+    console.log('called')
+    const newPassword = req.body.password
+    const sentToken = req.body.token
+    User.findOne({resetToken:sentToken,expireToken:{$gt:Date.now()}})
+    .then(user=>{
+        if(!user){
+            return res.status(422).json({error:"Try again session expired"})
+        }
+        bcrypt.hash(newPassword,12).then(hashedpassword=>{
+           user.password = hashedpassword
+           user.resetToken = undefined
+           user.expireToken = undefined
+           user.save().then((saveduser)=>{
+               res.json({message:"password updated successfully"})
+           })
+        })
+    }).catch(err=>{
+        console.log(err)
+    })
+})
 
 
 module.exports = router;
