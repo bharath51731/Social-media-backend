@@ -172,11 +172,11 @@ router.delete('/deletepost/:postId',requireLogin,(req,res)=>{
 router.delete('/deletecomment',requireLogin,(req,res)=>{
 
      
-    const {pid,comment} = req.body
+    const {pid,cid} = req.body
     
    
    Post.updateOne({_id:pid},{
-       $pull:{comments:comment}
+       $pull:{comments:{_id:cid}}
    },{
     new:true
 })
