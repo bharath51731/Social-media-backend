@@ -166,6 +166,15 @@ router.delete('/deletepost/:postId',requireLogin,(req,res)=>{
         }
     })
 })
+router.delete('/deleteAllPost',requireLogin,(req,res)=>{
+   Post.deleteMany({postedBy:req.user._id})
+   .then(()=>{
+       res.json({"message":"Deleted"})
+   })
+   .catch(err=>{
+       res.status(422).json({"error":"Something Went Wrong"})
+   })
+})
 
 
 
