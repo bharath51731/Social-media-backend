@@ -27,6 +27,24 @@ router.get('/',(req,res)=>{
 router.get('/protected',requireLogin,(req,res)=>{
     res.send("hello user")
 })
+
+router.post('/exists',(req,res)=>{
+    User.findOne({email:req.body.email})
+    .then(saveduser =>{
+        if(saveduser)
+        {
+            return res.status(422).json({"error":"user already exists"})  
+        }
+        else
+        {
+            return res.json({"message":"user doesnt't exists"})  
+
+        }
+    })
+        .catch((err)=>{
+            return res.status(422).json({"error":err})
+        })
+})
 router.post('/signup',(req,res)=>{
     const {email,password,name,url} = req.body;
     if(!email || !name || !password)
