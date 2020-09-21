@@ -21,7 +21,7 @@ var transporter = nodemailer.createTransport({
   });
 
 router.get('/',(req,res)=>{
-    res.send('Update')
+    res.send('Updated')
 })
 
 router.get('/protected',requireLogin,(req,res)=>{
@@ -76,7 +76,8 @@ router.post('/signup',(req,res)=>{
                 from: 'weconnectdevelopers@gmail.com',
                 to: email,
                 subject: 'Welcome',
-                text: 'Succesfully Signed in to We connect'
+                // text: 'Succesfully Signed in to We connect',
+                text: 'Your Account has been created Succesfully'
               };
               
               transporter.sendMail(mailOptions, function(error, info){

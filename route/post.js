@@ -7,9 +7,9 @@ const User = mongoose.model("User")
 const Post = mongoose.model('Post')
 
 router.post('/createpost',requireLogin,(req,res)=>{
-    const {title,body,url} = req.body
+    const {body,url} = req.body
 
-    if(!title && !body && !url)
+    if( !body && !url)
     {
         return res.status(422).json({"error":"please fill atleast one feilds"})
     }
@@ -21,7 +21,6 @@ router.post('/createpost',requireLogin,(req,res)=>{
     today = dd + '/' + mm + '/' + yyyy;
     req.user.password = undefined
     const post = new Post({
-        title,
         body,
         postedBy:req.user,
         photo:url,
