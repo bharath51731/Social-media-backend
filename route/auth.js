@@ -87,7 +87,7 @@ router.post('/signup',(req,res)=>{
                   
                 }
               });
-            return res.json({"meassge":"Account Created succesfully"})
+            return res.json({"meassge":"Account Created successfully"})
         })
         .catch(err => console.log(err))
     })
