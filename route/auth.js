@@ -77,7 +77,7 @@ router.post('/signup',(req,res)=>{
                 to: email,
                 subject: 'Welcome',
                 // text: 'Succesfully Signed in to We connect',
-                text: 'Your Account has been created Succesfully'
+                text: 'Your Account has been created Successfully'
               };
               
               transporter.sendMail(mailOptions, function(error, info){
