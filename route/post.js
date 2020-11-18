@@ -38,7 +38,7 @@ router.post('/createpost',requireLogin,(req,res)=>{
 router.get('/allpost',requireLogin,(req,res)=>{
    Post.find()
       .populate('postedBy','_id name pic')
-     .populate("comments.postedBy","_id name")
+    //  .populate("comments.postedBy","_id name")
      .sort("-createdAt")
    .then(posts =>{
        return res.json({posts})
@@ -51,7 +51,7 @@ router.post('/myallpost',requireLogin,(req,res)=>{
    
    Post.find({postedBy:req.body.id})
       .populate('postedBy','_id name pic')
-     .populate("comments.postedBy","_id name")
+    //  .populate("comments.postedBy","_id name")
      .sort("-createdAt")
    .then(posts =>{
        return res.json({posts})
@@ -63,7 +63,7 @@ router.get('/followingpost',requireLogin,(req,res)=>{
     
    Post.find({postedBy:{$in:req.user.following}})
       .populate('postedBy','_id name pic')
-     .populate("comments.postedBy","_id name pic")
+    //  .populate("comments.postedBy","_id name pic")
      .sort("-createdAt")
    .then(posts =>{
        return res.json({posts})
