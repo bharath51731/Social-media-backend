@@ -11,6 +11,8 @@ const requireLogin = require('../middlewares/requireLogin')
 
 router.get('/user/:id',(req,res)=>{
     User.findOne({_id:req.params.id})
+    // .populate("followers","pic name")
+    // .populate("following","pic name")
     .select("-password")
     .then(user=>{
         Post.find({postedBy:req.params.id})
@@ -81,7 +83,7 @@ router.put('/unfollow',requireLogin,(req,res)=>{
 })
 })
 router.put('/changename',requireLogin,(req,res)=>{
-    User.updateOne({_id:req.user._id},{$set:{name:req.body.name}},{
+    User.findOneAndUpdate({_id:req.user._id},{$set:{name:req.body.name}},{
         new:true
     })
     .then(result=>{
@@ -91,7 +93,7 @@ router.put('/changename',requireLogin,(req,res)=>{
 })
 
 router.put('/changepic',requireLogin,(req,res)=>{
-    User.updateOne({_id:req.user._id},{$set:{pic:req.body.pic}},{
+    User.findOneAndUpdate({_id:req.user._id},{$set:{pic:req.body.pic}},{
         new:true
     })
     .then(result=>{
@@ -100,7 +102,7 @@ router.put('/changepic',requireLogin,(req,res)=>{
     .catch(err=>console.log(err))
 })
 router.put('/delpic',requireLogin,(req,res)=>{
-    User.updateOne({_id:req.user._id},{$set:{pic:"https://res.cloudinary.com/dnvgajic2/image/upload/v1598419807/default_user_brfslf.png"}},{
+    User.findOneAndUpdate({_id:req.user._id},{$set:{pic:"https://res.cloudinary.com/dnvgajic2/image/upload/v1598419807/default_user_brfslf.png"}},{
         new:true
     })
     .then(result=>{

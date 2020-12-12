@@ -134,7 +134,7 @@ router.put('/comment',requireLogin,(req,res)=>{
     },{
         new:true
     })
-     .populate("comments.postedBy","_id name")
+     .populate("comments.postedBy","_id name pic")
     .populate("postedBy","_id name pic")
     .exec((err,result)=>{
         if(err){
@@ -183,13 +183,13 @@ router.delete('/deletecomment',requireLogin,(req,res)=>{
     const {pid,cid} = req.body
     
    
-   Post.updateOne({_id:pid},{
+   Post.findOneAndUpdate({_id:pid},{
        $pull:{comments:{_id:cid}}
    },{
     new:true
 })
    .populate("comments.postedBy","_id name pic")
-   .populate("postedBy","_id")
+   .populate("postedBy","_id name pic")
    .then((result)=>{
        if(result)
        {
