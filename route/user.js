@@ -9,7 +9,7 @@ var bcrypt = require('bcrypt')
 const requireLogin = require('../middlewares/requireLogin')
 
 
-router.get('/user/:id',(req,res)=>{
+router.get('/user/:id',requireLogin,(req,res)=>{
     User.findOne({_id:req.params.id})
     // .populate("followers","pic name")
     // .populate("following","pic name")
@@ -176,6 +176,7 @@ router.delete('/delacc',requireLogin,(req,res)=>{
 router.get('/followers',requireLogin,(req,res)=>{
          User.find({_id:req.user._id})
          .populate("followers", "_id name pic")
+         .select("-password")
          .then(result=>{
              res.json({followers:result})
          })
