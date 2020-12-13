@@ -3,6 +3,8 @@ const {ObjectId} = mongoose.Schema.Types
 const userSchema = new mongoose.Schema({
     name:{
         type:String,
+        minlength:2,
+        maxlength:20,
         required:true
     },
     email:{
@@ -11,6 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type:String,
+        minlength:5,
         required:true
     },
     pic:{

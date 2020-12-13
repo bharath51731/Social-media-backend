@@ -4,6 +4,8 @@ const postSchema = new mongoose.Schema({
    
     body:{
         type:String,
+        maxlength:1000,
+        required:true
         
     },
     createdOn:{

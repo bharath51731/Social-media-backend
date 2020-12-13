@@ -2,5 +2,6 @@
 module.exports = {
     URI:process.env.URI,
     JWT_SECRET:process.env.JWT_SECRET,
-    password : process.env.PASSWORD
+    password : process.env.PASSWORD,
+    ekey:process.env.ekey
 }

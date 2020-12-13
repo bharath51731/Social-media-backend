@@ -5,10 +5,11 @@ var router = express.Router()
 require('../models/user')
 const jwt = require('jsonwebtoken');
 const User = mongoose.model("User")
-const {password} = require('../config/keys')
+const {password,ekey} = require('../config/keys')
 const crypto = require('crypto')
 const {JWT_SECRET} = require('../config/keys')
 const requireLogin = require('../middlewares/requireLogin')
+const fetch = require('node-fetch')
 
 var nodemailer = require('nodemailer');
 
@@ -28,29 +29,45 @@ router.get('/protected',requireLogin,(req,res)=>{
     res.send("hello user")
 })
 
-router.post('/exists',(req,res)=>{
-    User.findOne({email:req.body.email})
-    .then(saveduser =>{
-        if(saveduser)
-        {
-            return res.status(422).json({"error":"user already exists"})  
-        }
-        else
-        {
-            return res.json({"message":"user doesnt't exists"})  
+// router.post('/exists',(req,res)=>{
+//     User.findOne({email:req.body.email})
+//     .then(saveduser =>{
+//         if(saveduser)
+//         {
+//             return res.status(422).json({"error":"user already exists"})  
+//         }
+//         else
+//         {
+//             return res.json({"message":"user doesnt't exists"})  
 
-        }
-    })
-        .catch((err)=>{
-            return res.status(422).json({"error":err})
-        })
-})
-router.post('/signup',(req,res)=>{
+//         }
+//     })
+//         .catch((err)=>{
+//             return res.status(422).json({"error":err})
+//         })
+// })
+router.post('/signup',async (req,res)=>{
     const {email,password,name,url} = req.body;
     if(!email || !name || !password)
     {
         return res.status(422).json({"error":"Please add all the fields"})
     }
+
+
+    try{
+        var result = await fetch(`https://emailverification.whoisxmlapi.com/api/v1?apiKey=${ekey}&emailAddress=${email}`);
+        var result = await result.json();
+       
+        if(result.dnsCheck === "false")
+        {
+          return res.status(422).json({error:"Invalid Email"})  
+        }
+        
+    }
+   catch(err)
+        {
+            return res.status(422).json({error:"Something Went Wrong"})
+        }
    
     User.findOne({email:email})
     .then(saveduser =>{
