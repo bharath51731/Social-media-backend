@@ -53,6 +53,13 @@ router.post('/signup',async (req,res)=>{
         return res.status(422).json({"error":"Please add all the fields"})
     }
 
+    if(name.length<2 || name.length>20)
+    return res.status(422).json({"error":"Name criteria not matching"})
+
+    if(password.length<5 || password.length>12)
+    return res.status(422).json({"error":"Password criteria not matching"})
+
+
 
     try{
         var result = await fetch(`https://emailverification.whoisxmlapi.com/api/v1?apiKey=${ekey}&emailAddress=${email}`);
