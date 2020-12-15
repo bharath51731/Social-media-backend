@@ -46,7 +46,7 @@ router.get('/protected',requireLogin,(req,res)=>{
 //             return res.status(422).json({"error":err})
 //         })
 // })
-router.post('/signup',async (req,res)=>{
+router.post('/signup', (req,res)=>{
     const {email,password,name,url} = req.body;
     if(!email || !name || !password)
     {
@@ -64,7 +64,7 @@ router.post('/signup',async (req,res)=>{
     
    
     User.findOne({email:email})
-    .then(saveduser =>{
+    .then(async (saveduser) =>{
         if(saveduser)
         {
             return res.status(422).json({"error":"user already exists"})  
@@ -77,7 +77,7 @@ router.post('/signup',async (req,res)=>{
             {
                 return res.status(422).json({error:"Something Went Wrong"})  
             }
-            
+
             result = await result.json();
            
             if(result.dnsCheck === "false")
