@@ -61,20 +61,7 @@ router.post('/signup',async (req,res)=>{
 
 
 
-    try{
-        var result = await fetch(`https://emailverification.whoisxmlapi.com/api/v1?apiKey=${ekey}&emailAddress=${email}`);
-        var result = await result.json();
-       
-        if(result.dnsCheck === "false")
-        {
-          return res.status(422).json({error:"Invalid Email"})  
-        }
-        
-    }
-   catch(err)
-        {
-            return res.status(422).json({error:"Something Went Wrong"})
-        }
+    
    
     User.findOne({email:email})
     .then(saveduser =>{
@@ -82,6 +69,27 @@ router.post('/signup',async (req,res)=>{
         {
             return res.status(422).json({"error":"user already exists"})  
         }
+
+
+        try{
+            var result = await fetch(`https://emailverification.whoisxmlapi.com/api/v1?apiKey=${ekey}&emailAddress=${email}`);
+            if(!result.ok)
+            {
+                return res.status(422).json({error:"Something Went Wrong"})  
+            }
+            
+            result = await result.json();
+           
+            if(result.dnsCheck === "false")
+            {
+              return res.status(422).json({error:"Invalid Email"})  
+            }
+            
+        }
+       catch(err)
+            {
+                return res.status(422).json({error:"Something Went Wrong"})
+            }
         
         bcrypt.hash(password,12)
         .then(hashedpassword =>{
